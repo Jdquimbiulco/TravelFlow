@@ -1,0 +1,41 @@
+{
+  "name": "travelflow",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "lint": "eslint src/**/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jdquimbiulco/TravelFlow.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Jdquimbiulco/TravelFlow/issues"
+  },
+  "homepage": "https://github.com/Jdquimbiulco/TravelFlow#readme",
+  "devDependencies": {
+    "eslint": "^10.3.0",
+    "jest": "^30.4.0",
+    "nodemon": "^3.1.14",
+    "prisma": "^7.8.0",
+    "sonarqube-scanner": "^4.3.6",
+    "supertest": "^7.2.2"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-validator": "^7.3.2",
+    "pg": "^8.20.0"
+  }
+}
