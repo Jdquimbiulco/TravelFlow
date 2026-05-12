@@ -1,6 +1,5 @@
 const { Router } = require('express');
 const reservationController = require('../controllers/reservation.controller');
-
 const router = Router();
 
 router.get('/', reservationController.getAllReservations);

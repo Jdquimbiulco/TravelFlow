@@ -6,9 +6,9 @@ const paymentRoutes = require('./payment.routes');
 
 const router = Router();
 
-router.use('/users', userRoutes);
-router.use('/destinations', destinationRoutes);
-router.use('/reservations', reservationRoutes);
-router.use('/payments', paymentRoutes);
+router.use('/destinos', destinationRoutes);
+router.use('/pagos', paymentRoutes);
+router.use('/reservas', reservationRoutes);
+router.use('/usuarios', userRoutes);
 
 module.exports = router;

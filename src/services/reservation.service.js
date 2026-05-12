@@ -1,26 +1,37 @@
 const prisma = require('../config/db');
 
 const getAllReservations = async () => {
-  return await prisma.reservation.findMany({ include: { user: true, destination: true } });
+  return await prisma.reserva.findMany({
+    include: { usuario: true, destino: true }
+  });
 };
 
 const getReservationById = async (id) => {
-  return await prisma.reservation.findUnique({
+  return await prisma.reserva.findUnique({
     where: { id },
-    include: { user: true, destination: true }
+    include: { usuario: true, destino: true }
   });
 };
 
 const createReservation = async (data) => {
-  return await prisma.reservation.create({ data });
+  const formattedData = {
+    ...data,
+    fechaInicio: new Date(data.fechaInicio),
+    fechaFin: new Date(data.fechaFin)
+  };
+  return await prisma.reserva.create({ data: formattedData });
 };
 
 const updateReservation = async (id, data) => {
-  return await prisma.reservation.update({ where: { id }, data });
+  const formattedData = { ...data };
+  if (data.fechaInicio) formattedData.fechaInicio = new Date(data.fechaInicio);
+  if (data.fechaFin) formattedData.fechaFin = new Date(data.fechaFin);
+
+  return await prisma.reserva.update({ where: { id }, data: formattedData });
 };
 
 const deleteReservation = async (id) => {
-  return await prisma.reservation.delete({ where: { id } });
+  return await prisma.reserva.delete({ where: { id } });
 };
 
 module.exports = {
