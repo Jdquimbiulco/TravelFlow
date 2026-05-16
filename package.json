@@ -6,6 +6,7 @@
   "scripts": {
     "test": "jest",
     "dev": "nodemon src/server.js",
+    "front": "npm run dev --prefix frontend",
     "start": "node src/server.js",
     "lint": "eslint src/**/*.js"
   },
