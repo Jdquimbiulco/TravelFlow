@@ -1,37 +1,35 @@
 const prisma = require('../config/db');
 
 const getAllUsers = async () => {
-  return await prisma.user.findMany({
-    select: { id: true, email: true, name: true, createdAt: true, updatedAt: true }
+  return await prisma.usuario.findMany({
+    select: { id: true, correo: true, nombre: true, rol: true, fechaRegistro: true }
   });
 };
 
 const getUserById = async (id) => {
-  return await prisma.user.findUnique({
+  return await prisma.usuario.findUnique({
     where: { id },
-    select: { id: true, email: true, name: true, createdAt: true, updatedAt: true }
+    select: { id: true, correo: true, nombre: true, rol: true, fechaRegistro: true }
   });
 };
 
 const createUser = async (data) => {
-  return await prisma.user.create({
+  return await prisma.usuario.create({
     data,
-    select: { id: true, email: true, name: true, createdAt: true, updatedAt: true }
+    select: { id: true, correo: true, nombre: true, rol: true }
   });
 };
 
 const updateUser = async (id, data) => {
-  return await prisma.user.update({
+  return await prisma.usuario.update({
     where: { id },
     data,
-    select: { id: true, email: true, name: true, createdAt: true, updatedAt: true }
+    select: { id: true, correo: true, nombre: true, rol: true }
   });
 };
 
 const deleteUser = async (id) => {
-  return await prisma.user.delete({
-    where: { id }
-  });
+  return await prisma.usuario.delete({ where: { id } });
 };
 
 module.exports = {

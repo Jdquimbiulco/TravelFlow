@@ -12,7 +12,7 @@ const getAllDestinations = async (req, res, next) => {
 const getDestinationById = async (req, res, next) => {
   try {
     const destination = await destinationService.getDestinationById(Number(req.params.id));
-    if (!destination) return res.status(404).json({ message: 'Destination not found' });
+    if (!destination) return res.status(404).json({ message: 'Destino no encontrado' });
     res.status(200).json(destination);
   } catch (error) {
     next(error);
