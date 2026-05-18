@@ -37,6 +37,38 @@ const validateUser = [
   validateRequest,
 ];
 
+const validateUserUpdate = [
+  body('correo')
+    .optional()
+    .trim()
+    .isEmail()
+    .withMessage('Se requiere un correo válido'),
+  body('contrasena')
+    .optional()
+    .isLength({ min: 6 })
+    .withMessage('La contraseña debe tener al menos 6 caracteres'),
+  body('nombre')
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage('El nombre es obligatorio')
+    .matches(/^[A-Za-zÀ-ÖØ-öø-ÿ ]+$/)
+    .withMessage('El nombre solo puede contener letras y espacios'),
+  body('telefono')
+    .optional({ nullable: true, checkFalsy: true })
+    .isLength({ min: 9, max: 9 })
+    .withMessage('El teléfono debe tener 9 dígitos numéricos')
+    .isNumeric()
+    .withMessage('El teléfono solo debe contener números'),
+  body('documentoIdentidad')
+    .optional({ nullable: true, checkFalsy: true })
+    .isLength({ min: 10 })
+    .withMessage('El documento de identidad debe tener al menos 10 dígitos')
+    .isNumeric()
+    .withMessage('El documento de identidad solo debe contener números'),
+  validateRequest,
+];
+
 const validateDestination = [
   body('nombre').notEmpty().withMessage('El nombre del destino es obligatorio'),
   body('pais').notEmpty().withMessage('El país es obligatorio'),
@@ -52,6 +84,7 @@ const validateDestination = [
 
 module.exports = {
   validateUser,
+  validateUserUpdate,
   validateDestination,
   validateRequest,
 };
