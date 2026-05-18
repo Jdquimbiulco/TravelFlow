@@ -59,12 +59,44 @@ export default function Auth({ API_URL, onLogin }) {
   return (
     <div className="auth-shell">
       <div className="auth-background">
-        <span className="auth-icon plane">✈️</span>
-        <span className="auth-icon suitcase">🧳</span>
-        <span className="auth-icon map">🗺️</span>
-        <span className="auth-icon compass">🧭</span>
-        <span className="auth-icon star">⭐</span>
-      </div>
+        {/* IZQUIERDA: 2 aviones + 1 maleta (en medio) */}
+        <svg className="floating-plane plane-left-1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 10 L70 50 L50 60 L30 50 Z" fill="rgba(37, 99, 235, 0.5)" />
+            <circle cx="50" cy="55" r="3" fill="rgba(37, 99, 235, 0.5)" />
+        </svg>
+
+        <svg className="floating-suitcase suitcase-left-1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="25" width="60" height="50" rx="4" fill="rgba(37, 99, 235, 0.5)" />
+            <rect x="40" y="20" width="20" height="8" rx="2" fill="rgba(37, 99, 235, 0.5)" />
+            <circle cx="35" cy="70" r="4" fill="rgba(37, 99, 235, 0.5)" />
+            <circle cx="65" cy="70" r="4" fill="rgba(37, 99, 235, 0.5)" />
+        </svg>
+
+        <svg className="floating-plane plane-left-2" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 10 L70 50 L50 60 L30 50 Z" fill="rgba(37, 99, 235, 0.5)" />
+            <circle cx="50" cy="55" r="3" fill="rgba(37, 99, 235, 0.5)" />
+        </svg>
+
+        {/* DERECHA: 2 maletas + 1 avión */}
+        <svg className="floating-suitcase suitcase-right-1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="25" width="60" height="50" rx="4" fill="rgba(37, 99, 235, 0.5)" />
+            <rect x="40" y="20" width="20" height="8" rx="2" fill="rgba(37, 99, 235, 0.5)" />
+            <circle cx="35" cy="70" r="4" fill="rgba(37, 99, 235, 0.5)" />
+            <circle cx="65" cy="70" r="4" fill="rgba(37, 99, 235, 0.5)" />
+        </svg>
+
+        <svg className="floating-plane plane-right-1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 10 L70 50 L50 60 L30 50 Z" fill="rgba(37, 99, 235, 0.5)" />
+            <circle cx="50" cy="55" r="3" fill="rgba(37, 99, 235, 0.5)" />
+        </svg>
+
+        <svg className="floating-suitcase suitcase-right-2" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="25" width="60" height="50" rx="4" fill="rgba(37, 99, 235, 0.5)" />
+            <rect x="40" y="20" width="20" height="8" rx="2" fill="rgba(37, 99, 235, 0.5)" />
+            <circle cx="35" cy="70" r="4" fill="rgba(37, 99, 235, 0.5)" />
+            <circle cx="65" cy="70" r="4" fill="rgba(37, 99, 235, 0.5)" />
+        </svg>
+        </div>
       <div className="auth-panel glass">
         <h1>Bienvenido a TravelFlow</h1>
         <p>Inicia sesión para gestionar destinos, reservas y pagos, o crea tu cuenta en segundos.</p>
