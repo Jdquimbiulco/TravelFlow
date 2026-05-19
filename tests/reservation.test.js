@@ -62,13 +62,9 @@ describe('Reservation Endpoints', () => {
     const res = await request(app)
       .post('/api/reservas')
       .send({
-        usuarioId: testUserId,
-        // No enviamos destinoId ni fechas para forzar la validación
-      });
-
-    // Ahora esperamos un 400 Bad Request profesional
-    expect(res.statusCode).toEqual(400); 
-    // Y verificamos que el guardia (express-validator) haya capturado el error
+        usuarioId: testUserId,        
+      });    
+    expect(res.statusCode).toEqual(400);     
     expect(res.body.errors).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ path: 'destinoId' }),

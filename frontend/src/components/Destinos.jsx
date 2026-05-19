@@ -37,7 +37,7 @@ const clampNonNegative = (value, isInteger = false) => {
   return isInteger ? Math.floor(num) : num
 }
 
-const Destinos = ({ API_URL, user }) => {
+const Destinos = ({ API_URL }) => {
   const [loading, setLoading] = useState(true)
   const [dataList, setDataList] = useState([])
   const [form, setForm] = useState(INITIAL_FORM)
@@ -382,8 +382,7 @@ const Destinos = ({ API_URL, user }) => {
                           onClick={() => setPendingDeleteId(null)}
                           disabled={loading}
                           aria-label="Cancelar eliminación"
-                        >
-                          <X size={16} />
+                        >                          
                         </button>
                       </>
                     ) : (
