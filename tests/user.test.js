@@ -3,6 +3,7 @@ const app = require('../src/app');
 
 describe('User Endpoints', () => {
   const randomEmail = `test.user.${Date.now()}@example.com`;
+  const randomDocumento = `ID-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
   let createdUserId;
 
   // Test para devolver todos los usuarios
@@ -21,7 +22,7 @@ describe('User Endpoints', () => {
         contrasena: 'Password1',
         nombre: 'Juan Perez',
         telefono: '987654321',
-        documentoIdentidad: '1234567890',
+        documentoIdentidad: randomDocumento,
       });
 
     expect(res.statusCode).toEqual(201);

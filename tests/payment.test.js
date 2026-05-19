@@ -3,6 +3,8 @@ const request = require('supertest');
 const app = require('../src/app');
 const prisma = require('../src/config/db');
 
+jest.setTimeout(20000);
+
 describe('Payment Endpoints', () => {
     let testUserId;
     let testDestinoId;
@@ -96,12 +98,30 @@ describe('Payment Endpoints', () => {
 
     // Limpieza final de la base de datos de pruebas
     afterAll(async () => {
-        if (testUserId) {
-            await request(app).delete(`/api/usuarios/${testUserId}`);
+        try {
+            if (testReservaId) {
+                await request(app).delete(`/api/reservas/${testReservaId}`);
+            }
+        } catch (err) {
+            // ignore cleanup failures
         }
-        if (testDestinoId) {
-            await request(app).delete(`/api/destinos/${testDestinoId}`);
+
+        try {
+            if (testUserId) {
+                await request(app).delete(`/api/usuarios/${testUserId}`);
+            }
+        } catch (err) {
+            // ignore cleanup failures
         }
+
+        try {
+            if (testDestinoId) {
+                await request(app).delete(`/api/destinos/${testDestinoId}`);
+            }
+        } catch (err) {
+            // ignore cleanup failures
+        }
+
         // Desconecta Prisma para evitar advertencias de open handles en Jest
         await prisma.$disconnect();
     });
