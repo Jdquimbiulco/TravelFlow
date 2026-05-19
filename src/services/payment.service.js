@@ -44,7 +44,7 @@ const updatePayment = async (id, data) => {
 
 const deletePayment = async (id) => {
   const pago = await prisma.pago.findUnique({ where: { id } });
-  if (pago && pago.reservaId) {
+  if (pago?.reservaId) {
     await prisma.reserva.update({
       where: { id: pago.reservaId },
       data: { estado: 'PENDIENTE' }
