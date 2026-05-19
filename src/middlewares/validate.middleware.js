@@ -80,9 +80,29 @@ const validateDestination = [
   validateRequest,
 ];
 
+const validateReservation = [
+  body('usuarioId')
+    .isInt({ min: 1 })
+    .withMessage('El ID de usuario debe ser un número entero válido'),
+  body('destinoId')
+    .isInt({ min: 1 })
+    .withMessage('El ID de destino debe ser un número entero válido'),
+  body('fechaInicio')
+    .isISO8601()
+    .withMessage('Se requiere una fecha de inicio válida'),
+  body('fechaFin')
+    .isISO8601()
+    .withMessage('Se requiere una fecha de fin válida'),
+  body('precioTotal')
+    .isFloat({ min: 0 })
+    .withMessage('El precio total debe ser un número positivo'),
+  validateRequest,
+];
+
 module.exports = {
   validateUser,
   validateUserUpdate,
   validateDestination,
+  validateReservation,
   validateRequest,
 };
