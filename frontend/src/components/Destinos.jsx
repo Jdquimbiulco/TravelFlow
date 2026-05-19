@@ -4,7 +4,6 @@ import {
   Loader2,
   Pencil,
   Trash2,
-  X,
   Save,
   MapPin,
 } from 'lucide-react'
@@ -13,8 +12,8 @@ const INITIAL_FORM = {
   nombre: '',
   pais: '',
   ciudad: '',
-  precioPorDia: 100,
-  cuposDisponibles: 10,
+  precioPorDia: '',
+  cuposDisponibles: '',
 }
 
 const parseApiError = async (response) => {
@@ -38,7 +37,7 @@ const clampNonNegative = (value, isInteger = false) => {
   return isInteger ? Math.floor(num) : num
 }
 
-const Destinos = ({ API_URL }) => {
+const Destinos = ({ API_URL, user }) => {
   const [loading, setLoading] = useState(true)
   const [dataList, setDataList] = useState([])
   const [form, setForm] = useState(INITIAL_FORM)
@@ -201,7 +200,7 @@ const Destinos = ({ API_URL }) => {
     message.type === 'success' ? 'account-message success' : 'account-message error'
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem', marginTop: '2rem' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem', marginTop: '2rem', alignItems: 'start' }}>
       <div className="glass" style={{ padding: '1.5rem', borderRadius: '16px' }}>
         <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           {isEditing ? <Save size={20} /> : <PlusCircle size={20} />}
@@ -354,52 +353,52 @@ const Destinos = ({ API_URL }) => {
                 </p>
 
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    style={{ flex: 1, padding: '0.5rem' }}
-                    onClick={() => startEdit(item)}
-                    disabled={loading}
-                    aria-label={`Editar ${item.nombre}`}
-                  >
-                    <Pencil size={16} />
-                  </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      style={{ flex: 1, padding: '0.5rem' }}
+                      onClick={() => startEdit(item)}
+                      disabled={loading}
+                      aria-label={`Editar ${item.nombre}`}
+                    >
+                      <Pencil size={16} />
+                    </button>
 
-                  {pendingDeleteId === item.id ? (
-                    <>
+                    {pendingDeleteId === item.id ? (
+                      <>
+                        <button
+                          type="button"
+                          className="btn btn-danger"
+                          style={{ flex: 1, padding: '0.5rem', fontSize: '0.85rem' }}
+                          onClick={() => handleDelete(item.id)}
+                          disabled={loading}
+                        >
+                          Confirmar
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-secondary"
+                          style={{ padding: '0.5rem' }}
+                          onClick={() => setPendingDeleteId(null)}
+                          disabled={loading}
+                          aria-label="Cancelar eliminación"
+                        >
+                          <X size={16} />
+                        </button>
+                      </>
+                    ) : (
                       <button
                         type="button"
                         className="btn btn-danger"
-                        style={{ flex: 1, padding: '0.5rem', fontSize: '0.85rem' }}
-                        onClick={() => handleDelete(item.id)}
+                        style={{ flex: 1, padding: '0.5rem' }}
+                        onClick={() => setPendingDeleteId(item.id)}
                         disabled={loading}
+                        aria-label={`Eliminar ${item.nombre}`}
                       >
-                        Confirmar
+                        <Trash2 size={16} />
                       </button>
-                      <button
-                        type="button"
-                        className="btn btn-secondary"
-                        style={{ padding: '0.5rem' }}
-                        onClick={() => setPendingDeleteId(null)}
-                        disabled={loading}
-                        aria-label="Cancelar eliminación"
-                      >
-                        <X size={16} />
-                      </button>
-                    </>
-                  ) : (
-                    <button
-                      type="button"
-                      className="btn btn-danger"
-                      style={{ flex: 1, padding: '0.5rem' }}
-                      onClick={() => setPendingDeleteId(item.id)}
-                      disabled={loading}
-                      aria-label={`Eliminar ${item.nombre}`}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  )}
-                </div>
+                    )}
+                  </div>
               </article>
             ))}
           </div>

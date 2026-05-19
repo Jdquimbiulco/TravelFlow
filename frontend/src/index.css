@@ -38,6 +38,8 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 2rem;
+  position: relative;
+  z-index: 1;
 }
 
 /* Glassmorphism utility */
@@ -53,7 +55,8 @@ body {
 .navbar {
   position: sticky;
   top: 1rem;
-  z-index: 100;
+  z-index: 9999;
+  transform: translateZ(0);
   margin: 1rem auto;
   width: calc(100% - 2rem);
   max-width: 1100px;

@@ -28,7 +28,7 @@ function App() {
       </nav>
 
       <main className="container">
-        {view === 'destinos' && <Destinos API_URL={API_URL} />}
+        {view === 'destinos' && <Destinos API_URL={API_URL} user={user} />}
         {view === 'reservas' && <Reservas API_URL={API_URL} />}
         {view === 'pagos' && <Pagos API_URL={API_URL} />}
         {view === 'account' && <Account user={user} API_URL={API_URL} onLogout={() => { setUser(null); setView('destinos') }} onUpdate={setUser} />}

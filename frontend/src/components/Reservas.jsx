@@ -9,6 +9,8 @@ import {
   Calendar,
   User,
   MapPin,
+  CheckCircle,
+  Clock,
 } from 'lucide-react'
 
 const INITIAL_FORM = {
@@ -152,6 +154,26 @@ const Reservas = ({ API_URL }) => {
     return () => clearTimeout(timer)
   }, [message.text, clearMessage])
 
+  useEffect(() => {
+    if (!form.destinoId || !form.fechaInicio || !form.fechaFin) return;
+
+    const start = new Date(form.fechaInicio);
+    const end = new Date(form.fechaFin);
+    if (end < start) return;
+
+    const destino = destinations.find(d => d.id === parseInt(form.destinoId, 10));
+    if (!destino) return;
+
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const days = diffDays > 0 ? diffDays : 1;
+    
+    const calculatedPrice = days * destino.precioPorDia;
+    if (parseFloat(form.precioTotal) !== calculatedPrice) {
+      setForm(prev => ({ ...prev, precioTotal: calculatedPrice }));
+    }
+  }, [form.destinoId, form.fechaInicio, form.fechaFin, destinations]);
+
   const resetForm = () => {
     setForm(INITIAL_FORM)
     setEditingId(null)
@@ -270,7 +292,7 @@ const Reservas = ({ API_URL }) => {
   const formDisabled = loading || optionsLoading
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem', marginTop: '2rem' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem', marginTop: '2rem', alignItems: 'start' }}>
       <div className="glass" style={{ padding: '1.5rem', borderRadius: '16px' }}>
         <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           {isEditing ? <Save size={20} /> : <PlusCircle size={20} />}
@@ -434,13 +456,17 @@ const Reservas = ({ API_URL }) => {
                   {item.estado && (
                     <span
                       style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.25rem',
                         fontSize: '0.75rem',
                         padding: '0.2rem 0.5rem',
                         borderRadius: '6px',
-                        background: 'rgba(37, 99, 235, 0.1)',
-                        color: 'var(--primary)',
+                        background: item.estado === 'COMPLETADO' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(37, 99, 235, 0.1)',
+                        color: item.estado === 'COMPLETADO' ? '#10b981' : 'var(--primary)',
                       }}
                     >
+                      {item.estado === 'COMPLETADO' ? <CheckCircle size={12} /> : <Clock size={12} />}
                       {item.estado}
                     </span>
                   )}
@@ -457,6 +483,11 @@ const Reservas = ({ API_URL }) => {
                 <p style={{ marginTop: '0.35rem', fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                   <Calendar size={14} />
                   {formatDisplayDate(item.fechaInicio)} → {formatDisplayDate(item.fechaFin)}
+                  {item.fechaInicio && item.fechaFin && (
+                    <span style={{ marginLeft: '0.25rem', background: 'rgba(255,255,255,0.1)', padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                      {Math.max(1, Math.ceil(Math.abs(new Date(item.fechaFin) - new Date(item.fechaInicio)) / (1000 * 60 * 60 * 24)))} {Math.max(1, Math.ceil(Math.abs(new Date(item.fechaFin) - new Date(item.fechaInicio)) / (1000 * 60 * 60 * 24))) === 1 ? 'día' : 'días'}
+                    </span>
+                  )}
                 </p>
                 <p style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>
                   <strong>${Number(item.precioTotal).toFixed(2)}</strong>
