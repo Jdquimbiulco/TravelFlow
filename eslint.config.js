@@ -21,8 +21,16 @@ module.exports = [
       },
     },
     rules: {
-      "no-console": "warn",
-      "semi": ["error", "always"],
+    'no-console': ['warn', {
+    allow: ['warn', 'error', 'info', 'log'],
+    }],
+      semi: ['error', 'always'],
+      quotes: ['error', 'single'],
+      'no-unused-vars': ['warn', {
+        argsIgnorePattern: '^_',
+      }],
+      'no-multi-spaces': 'error',
+      'no-trailing-spaces': 'error',
     },
   },
 ];
