@@ -1,0 +1,10 @@
+name: Integracion Continua
+on: [push]
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v3
+      - name: Ejecutar script de prueba
+        run: echo "Ejecutando pruebas de software con GitHub Actions."
