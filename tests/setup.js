@@ -3,5 +3,7 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-  console.error.mockRestore();
+  if (console.error.mockRestore) {
+    console.error.mockRestore();
+  }
 });
