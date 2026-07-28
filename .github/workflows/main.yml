@@ -1,0 +1,45 @@
+name: CI/CD workflow
+on: 
+  push:
+    branches: [ main, "Pruebas/juan" ]
+  pull_request:
+    branches: [ main, "Pruebas/juan" ]
+jobs: 
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: clonar repositorio
+        uses: actions/checkout@v3 
+      - name: configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: instalar dependencias
+        run: npm install
+      - name: ejecutar pruebas
+        run: npm test
+  despliegue-produccion:
+    name: Despliegue en producción en Vercel
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.event.name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/Pruebas/juan')
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - name: clonar repositorio
+        uses: actions/checkout@v3
+      - name: configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: instalar dependencias
+        run: npm install
+      - name: instalar Vercel CLI
+        run: npm install --global vercel@latest
+      - name: Obtener configuración de Vercel
+        run: vercel pull --yes --environment=production --token ${{ secrets.VERCEL_TOKEN }}
+      - name: Construir el proyecto
+        run: vercel build --prod --token ${{ secrets.VERCEL_TOKEN }}
+      - name: desplegar en Vercel
+        run: vercel deploy --prebuilt --prod --token ${{ secrets.VERCEL_TOKEN }} --confirm
