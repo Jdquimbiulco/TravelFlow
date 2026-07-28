@@ -16,6 +16,8 @@ jobs:
           node-version: '20'
       - name: instalar dependencias
         run: npm install
+      - name: generar prisma
+        run: npx prisma generate
       - name: ejecutar pruebas
         run: npm test
   despliegue-produccion:
