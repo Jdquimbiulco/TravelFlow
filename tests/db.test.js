@@ -17,7 +17,7 @@ describe('Database Configuration', () => {
     });
 
     it('should throw an error if DATABASE_URL is not defined', () => {
-        delete process.env.DATABASE_URL;
+        process.env.DATABASE_URL = '';
         expect(() => {
             require('../src/config/db');
         }).toThrow('DATABASE_URL is not defined. Ensure env file exists and includes DATABASE_URL.');
