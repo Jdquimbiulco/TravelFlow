@@ -31,6 +31,8 @@ const updateReservation = async (id, data) => {
 };
 
 const deleteReservation = async (id) => {
+  // Eliminar los pagos asociados a la reserva primero para evitar el error de clave foránea
+  await prisma.pago.deleteMany({ where: { reservaId: id } });
   return await prisma.reserva.delete({ where: { id } });
 };
 
