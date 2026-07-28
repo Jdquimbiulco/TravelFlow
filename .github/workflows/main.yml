@@ -18,6 +18,8 @@ jobs:
         run: npm install
       - name: generar prisma
         run: npx prisma generate
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
       - name: ejecutar pruebas
         run: npm test
   despliegue-produccion:
