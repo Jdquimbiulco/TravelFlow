@@ -11,6 +11,11 @@ import {
   MapPin,
   CheckCircle,
   Clock,
+  CalendarDays,
+  DollarSign,
+  ListChecks,
+  XCircle,
+  CheckCircle2,
 } from 'lucide-react'
 
 const INITIAL_FORM = {
@@ -156,18 +161,14 @@ const Reservas = ({ API_URL }) => {
 
   useEffect(() => {
     if (!form.destinoId || !form.fechaInicio || !form.fechaFin) return;
-
     const start = new Date(form.fechaInicio);
     const end = new Date(form.fechaFin);
     if (end < start) return;
-
     const destino = destinations.find(d => d.id === parseInt(form.destinoId, 10));
     if (!destino) return;
-
     const diffTime = Math.abs(end - start);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     const days = diffDays > 0 ? diffDays : 1;
-    
     const calculatedPrice = days * destino.precioPorDia;
     if (parseFloat(form.precioTotal) !== calculatedPrice) {
       setForm(prev => ({ ...prev, precioTotal: calculatedPrice }));
@@ -203,6 +204,7 @@ const Reservas = ({ API_URL }) => {
       fechaFin: toDateInputValue(item.fechaFin),
       precioTotal: Number(item.precioTotal) || 0,
     })
+    window.scrollTo({ top: 300, behavior: 'smooth' })
   }
 
   const cancelEdit = () => {
@@ -272,7 +274,7 @@ const Reservas = ({ API_URL }) => {
 
   const getUserLabel = (item) =>
     item.usuario?.nombre
-      ? `${item.usuario.nombre} (${item.usuario.correo})`
+      ? `${item.usuario.nombre}`
       : `Usuario #${item.usuarioId}`
 
   const getDestinoLabel = (item) =>
@@ -282,268 +284,302 @@ const Reservas = ({ API_URL }) => {
 
   const formatDisplayDate = (value) => {
     const date = new Date(value)
-    return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString('es-ES')
+    return Number.isNaN(date.getTime()) ? '—' : date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
   }
 
-  const inputStyle = { padding: '0.8rem' }
-  const selectStyle = { ...inputStyle, width: '100%' }
-  const messageClass =
-    message.type === 'success' ? 'account-message success' : 'account-message error'
+  const calcDays = (fechaInicio, fechaFin) => {
+    if (!fechaInicio || !fechaFin) return null
+    return Math.max(1, Math.ceil(Math.abs(new Date(fechaFin) - new Date(fechaInicio)) / (1000 * 60 * 60 * 24)))
+  }
+
   const formDisabled = loading || optionsLoading
+  const confirmadas = dataList.filter(r => r.estado === 'COMPLETADO' || r.estado === 'CONFIRMADA').length
+  const pendientes = dataList.filter(r => r.estado === 'PENDIENTE' || r.estado === 'PENDING').length
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem', marginTop: '2rem', alignItems: 'start' }}>
-      <div className="glass" style={{ padding: '1.5rem', borderRadius: '16px' }}>
-        <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          {isEditing ? <Save size={20} /> : <PlusCircle size={20} />}
-          {isEditing ? 'Editar reserva' : 'Nueva reserva'}
-        </h3>
-
-        {message.text && (
-          <p className={messageClass} style={{ marginTop: '1rem' }} role="status">
-            {message.text}
-          </p>
-        )}
-
-        {optionsLoading ? (
-          <p style={{ marginTop: '1rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Loader2 size={18} className="animate-spin" />
-            Cargando datos…
-          </p>
-        ) : (
-          <form
-            onSubmit={handleSubmit}
-            style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem' }}
-          >
-            <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Usuario</label>
-            <select
-              className="glass"
-              style={selectStyle}
-              value={form.usuarioId}
-              onChange={updateField('usuarioId')}
-              required
-              disabled={formDisabled}
-            >
-              <option value="">Selecciona un usuario</option>
-              {users.map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.nombre} ({user.correo})
-                </option>
-              ))}
-            </select>
-
-            <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Destino</label>
-            <select
-              className="glass"
-              style={selectStyle}
-              value={form.destinoId}
-              onChange={updateField('destinoId')}
-              required
-              disabled={formDisabled}
-            >
-              <option value="">Selecciona un destino</option>
-              {destinations.map((destino) => (
-                <option key={destino.id} value={destino.id}>
-                  {destino.nombre} — {destino.ciudad}, {destino.pais}
-                </option>
-              ))}
-            </select>
-
-            <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Fecha de inicio</label>
-            <input
-              type="date"
-              className="glass"
-              style={inputStyle}
-              value={form.fechaInicio}
-              onChange={updateField('fechaInicio')}
-              required
-              disabled={formDisabled}
-            />
-
-            <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Fecha de fin</label>
-            <input
-              type="date"
-              className="glass"
-              style={inputStyle}
-              value={form.fechaFin}
-              min={form.fechaInicio || undefined}
-              onChange={updateField('fechaFin')}
-              required
-              disabled={formDisabled}
-            />
-
-            {dateRangeInvalid && (
-              <p className="account-message error" style={{ margin: 0 }} role="alert">
-                La fecha de fin no puede ser anterior a la fecha de inicio.
-              </p>
-            )}
-
-            <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Precio total</label>
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="Precio total"
-              className="glass"
-              style={inputStyle}
-              value={form.precioTotal}
-              onChange={updatePrecio}
-              required
-              disabled={formDisabled}
-            />
-
-            <button
-              type="submit"
-              className="btn"
-              disabled={formDisabled || dateRangeInvalid}
-            >
-              {loading ? 'Procesando…' : isEditing ? 'Guardar cambios' : 'Crear reserva'}
-            </button>
-
-            {isEditing && (
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={cancelEdit}
-                disabled={formDisabled}
-              >
-                Cancelar edición
-              </button>
-            )}
-          </form>
-        )}
-      </div>
-
-      <div className="glass" style={{ padding: '1.5rem', borderRadius: '16px' }}>
-        <h3>Listado de reservas</h3>
-
-        {loading && dataList.length === 0 ? (
-          <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }}>
-            <Loader2 size={32} className="animate-spin" />
+    <div>
+      {/* Hero Section */}
+      <section className="section-hero">
+        <div style={{ position: 'relative', zIndex: 2 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(2, 132, 199, 0.1)', color: 'var(--primary-dark)', padding: '0.4rem 1rem', borderRadius: '999px', fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.85rem' }}>
+            <CalendarDays size={15} /> Gestión de Reservas
           </div>
-        ) : dataList.length === 0 ? (
-          <p style={{ marginTop: '1rem', color: 'var(--text-muted)' }}>
-            No hay reservas registradas.
+          <h1 className="section-hero-title">
+            Tus <span>Reservas de Viaje</span>
+          </h1>
+          <p className="section-hero-subtitle">
+            Crea, edita y gestiona todas las reservas turísticas. El precio se calcula automáticamente según el destino y las fechas elegidas.
           </p>
-        ) : (
-          <div
-            style={{
-              marginTop: '1rem',
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-              gap: '1rem',
-            }}
-          >
-            {dataList.map((item) => (
-              <article
-                key={item.id}
-                className="glass"
-                style={{
-                  padding: '1rem',
-                  borderRadius: '12px',
-                  border: editingId === item.id ? '2px solid var(--primary)' : undefined,
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    gap: '0.5rem',
-                  }}
+          {!loading && (
+            <div className="stats-bar">
+              <span className="stat-chip"><ListChecks size={14} /> {dataList.length} reservas totales</span>
+              {confirmadas > 0 && <span className="stat-chip emerald"><CheckCircle size={14} /> {confirmadas} confirmadas</span>}
+              {pendientes > 0 && <span className="stat-chip accent"><Clock size={14} /> {pendientes} pendientes</span>}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Mensaje global */}
+      {message.text && (
+        <div className={`account-message ${message.type}`} style={{ marginBottom: '1.5rem' }} role="status">
+          {message.type === 'success' ? <CheckCircle2 size={18} /> : <XCircle size={18} />}
+          {message.text}
+        </div>
+      )}
+
+      {/* Panel layout */}
+      <div className="panel-layout">
+        {/* Sidebar: Formulario */}
+        <div className="panel-sidebar glass">
+          <div className="panel-title">
+            {isEditing ? <Save size={18} /> : <PlusCircle size={18} />}
+            {isEditing ? 'Editar reserva' : 'Nueva reserva'}
+          </div>
+
+          {optionsLoading ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-muted)', padding: '1rem 0' }}>
+              <Loader2 size={20} className="animate-spin" style={{ color: 'var(--primary)' }} />
+              Cargando datos…
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {/* Usuario */}
+              <div className="field-group">
+                <label className="field-label"><User size={12} style={{ display: 'inline', marginRight: '0.3rem' }} />Usuario</label>
+                <select
+                  className="glass"
+                  style={{ padding: '0.85rem 1rem' }}
+                  value={form.usuarioId}
+                  onChange={updateField('usuarioId')}
+                  required
+                  disabled={formDisabled}
                 >
-                  <strong style={{ fontSize: '1.05rem' }}>Reserva #{item.id}</strong>
-                  {item.estado && (
-                    <span
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.25rem',
-                        fontSize: '0.75rem',
-                        padding: '0.2rem 0.5rem',
-                        borderRadius: '6px',
-                        background: item.estado === 'COMPLETADO' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(37, 99, 235, 0.1)',
-                        color: item.estado === 'COMPLETADO' ? '#10b981' : 'var(--primary)',
-                      }}
-                    >
-                      {item.estado === 'COMPLETADO' ? <CheckCircle size={12} /> : <Clock size={12} />}
-                      {item.estado}
-                    </span>
-                  )}
+                  <option value="">Selecciona un usuario</option>
+                  {users.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {user.nombre} ({user.correo})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Destino */}
+              <div className="field-group">
+                <label className="field-label"><MapPin size={12} style={{ display: 'inline', marginRight: '0.3rem' }} />Destino</label>
+                <select
+                  className="glass"
+                  style={{ padding: '0.85rem 1rem' }}
+                  value={form.destinoId}
+                  onChange={updateField('destinoId')}
+                  required
+                  disabled={formDisabled}
+                >
+                  <option value="">Selecciona un destino</option>
+                  {destinations.map((destino) => (
+                    <option key={destino.id} value={destino.id}>
+                      {destino.nombre} — {destino.ciudad}, {destino.pais}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Fechas */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <div className="field-group">
+                  <label className="field-label"><Calendar size={12} style={{ display: 'inline', marginRight: '0.3rem' }} />Inicio</label>
+                  <input
+                    type="date"
+                    className="glass"
+                    style={{ padding: '0.85rem 0.75rem' }}
+                    value={form.fechaInicio}
+                    onChange={updateField('fechaInicio')}
+                    required
+                    disabled={formDisabled}
+                  />
                 </div>
+                <div className="field-group">
+                  <label className="field-label"><Calendar size={12} style={{ display: 'inline', marginRight: '0.3rem' }} />Fin</label>
+                  <input
+                    type="date"
+                    className="glass"
+                    style={{ padding: '0.85rem 0.75rem' }}
+                    value={form.fechaFin}
+                    min={form.fechaInicio || undefined}
+                    onChange={updateField('fechaFin')}
+                    required
+                    disabled={formDisabled}
+                  />
+                </div>
+              </div>
 
-                <p style={{ marginTop: '0.75rem', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                  <User size={14} />
-                  {getUserLabel(item)}
-                </p>
-                <p style={{ marginTop: '0.35rem', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                  <MapPin size={14} />
-                  {getDestinoLabel(item)}
-                </p>
-                <p style={{ marginTop: '0.35rem', fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                  <Calendar size={14} />
-                  {formatDisplayDate(item.fechaInicio)} → {formatDisplayDate(item.fechaFin)}
-                  {item.fechaInicio && item.fechaFin && (
-                    <span style={{ marginLeft: '0.25rem', background: 'rgba(255,255,255,0.1)', padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-                      {Math.max(1, Math.ceil(Math.abs(new Date(item.fechaFin) - new Date(item.fechaInicio)) / (1000 * 60 * 60 * 24)))} {Math.max(1, Math.ceil(Math.abs(new Date(item.fechaFin) - new Date(item.fechaInicio)) / (1000 * 60 * 60 * 24))) === 1 ? 'día' : 'días'}
-                    </span>
-                  )}
-                </p>
-                <p style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>
-                  <strong>${Number(item.precioTotal).toFixed(2)}</strong>
-                </p>
+              {dateRangeInvalid && (
+                <div className="account-message error" role="alert" style={{ margin: 0 }}>
+                  <XCircle size={16} /> La fecha de fin no puede ser anterior a la de inicio.
+                </div>
+              )}
 
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    style={{ flex: 1, padding: '0.5rem' }}
-                    onClick={() => startEdit(item)}
-                    disabled={loading}
-                    aria-label={`Editar reserva ${item.id}`}
+              {/* Precio */}
+              <div className="field-group">
+                <label className="field-label"><DollarSign size={12} style={{ display: 'inline', marginRight: '0.3rem' }} />Precio total</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="Se calcula automáticamente"
+                  className="glass"
+                  style={{ padding: '0.85rem 1rem' }}
+                  value={form.precioTotal}
+                  onChange={updatePrecio}
+                  required
+                  disabled={formDisabled}
+                />
+                {form.destinoId && form.fechaInicio && form.fechaFin && !dateRangeInvalid && (
+                  <p style={{ fontSize: '0.78rem', color: 'var(--emerald)', fontWeight: 600, marginTop: '0.25rem' }}>
+                    ✓ Precio calculado automáticamente
+                  </p>
+                )}
+              </div>
+
+              <button type="submit" className="btn" disabled={formDisabled || dateRangeInvalid} style={{ marginTop: '0.25rem' }}>
+                {loading ? <><Loader2 size={16} className="animate-spin" /> Procesando…</> : isEditing ? 'Guardar cambios' : 'Crear reserva'}
+              </button>
+
+              {isEditing && (
+                <button type="button" className="btn btn-secondary" onClick={cancelEdit} disabled={formDisabled}>
+                  <X size={16} /> Cancelar edición
+                </button>
+              )}
+            </form>
+          )}
+        </div>
+
+        {/* Main: Listado */}
+        <div className="panel-main glass">
+          <div className="panel-title">
+            <CalendarDays size={18} />
+            Listado de reservas
+            <span style={{ marginLeft: 'auto', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+              {dataList.length} en total
+            </span>
+          </div>
+
+          {loading && dataList.length === 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', padding: '3rem' }}>
+              <Loader2 size={36} className="animate-spin" style={{ color: 'var(--primary)' }} />
+              <p style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Cargando reservas…</p>
+            </div>
+          ) : dataList.length === 0 ? (
+            <div className="empty-state">
+              <CalendarDays size={48} />
+              <p>No hay reservas registradas aún. ¡Crea la primera usando el formulario!</p>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+              {dataList.map((item) => {
+                const days = calcDays(item.fechaInicio, item.fechaFin)
+                const isCompleted = item.estado === 'COMPLETADO' || item.estado === 'CONFIRMADA'
+                return (
+                  <article
+                    key={item.id}
+                    className={`reserva-card ${editingId === item.id ? 'editing' : ''}`}
                   >
-                    <Pencil size={16} />
-                  </button>
+                    {/* Header */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                      <div>
+                        <strong style={{ fontSize: '1rem', color: 'var(--text-main)' }}>Reserva #{item.id}</strong>
+                        {days && (
+                          <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>
+                            {days} {days === 1 ? 'día' : 'días'}
+                          </span>
+                        )}
+                      </div>
+                      {item.estado && (
+                        <span className={`badge-status ${isCompleted ? 'badge-confirmada' : 'badge-pendiente'}`}>
+                          {isCompleted ? <CheckCircle size={12} /> : <Clock size={12} />}
+                          {item.estado}
+                        </span>
+                      )}
+                    </div>
 
-                  {pendingDeleteId === item.id ? (
-                    <>
-                      <button
-                        type="button"
-                        className="btn btn-danger"
-                        style={{ flex: 1, padding: '0.5rem', fontSize: '0.85rem' }}
-                        onClick={() => handleDelete(item.id)}
-                        disabled={loading}
-                      >
-                        Confirmar
-                      </button>
+                    {/* Info */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.88rem', color: 'var(--text-muted)' }}>
+                        <User size={14} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+                        <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{getUserLabel(item)}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.88rem', color: 'var(--text-muted)' }}>
+                        <MapPin size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+                        <span>{getDestinoLabel(item)}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                        <Calendar size={14} style={{ flexShrink: 0 }} />
+                        <span>{formatDisplayDate(item.fechaInicio)} → {formatDisplayDate(item.fechaFin)}</span>
+                      </div>
+                    </div>
+
+                    {/* Price */}
+                    <div style={{ paddingTop: '0.75rem', borderTop: '1px dashed #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Total</span>
+                      <span style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary-dark)' }}>
+                        ${Number(item.precioTotal).toFixed(2)}
+                      </span>
+                    </div>
+
+                    {/* Actions */}
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
                       <button
                         type="button"
                         className="btn btn-secondary"
-                        style={{ padding: '0.5rem' }}
-                        onClick={() => setPendingDeleteId(null)}
+                        style={{ flex: 1, padding: '0.55rem', fontSize: '0.84rem' }}
+                        onClick={() => startEdit(item)}
                         disabled={loading}
-                        aria-label="Cancelar eliminación"
+                        aria-label={`Editar reserva ${item.id}`}
                       >
-                        <X size={16} />
+                        <Pencil size={14} /> Editar
                       </button>
-                    </>
-                  ) : (
-                    <button
-                      type="button"
-                      className="btn btn-danger"
-                      style={{ flex: 1, padding: '0.5rem' }}
-                      onClick={() => setPendingDeleteId(item.id)}
-                      disabled={loading}
-                      aria-label={`Eliminar reserva ${item.id}`}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  )}
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
+
+                      {pendingDeleteId === item.id ? (
+                        <>
+                          <button
+                            type="button"
+                            className="btn btn-danger"
+                            style={{ flex: 1, padding: '0.55rem', fontSize: '0.82rem' }}
+                            onClick={() => handleDelete(item.id)}
+                            disabled={loading}
+                          >
+                            Confirmar
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-secondary"
+                            style={{ padding: '0.55rem' }}
+                            onClick={() => setPendingDeleteId(null)}
+                            disabled={loading}
+                            aria-label="Cancelar eliminación"
+                          >
+                            <X size={14} />
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          type="button"
+                          className="btn btn-danger"
+                          style={{ padding: '0.55rem' }}
+                          onClick={() => setPendingDeleteId(item.id)}
+                          disabled={loading}
+                          aria-label={`Eliminar reserva ${item.id}`}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                    </div>
+                  </article>
+                )
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

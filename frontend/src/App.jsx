@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Compass, MapPin, Calendar, CreditCard, UserCircle2 } from 'lucide-react'
+import { Compass, MapPin, Calendar, CreditCard, UserCircle2, Heart } from 'lucide-react'
 import Destinos from './components/Destinos.jsx'
 import Reservas from './components/Reservas.jsx'
 import Pagos from './components/Pagos.jsx'
@@ -18,7 +18,7 @@ function App() {
   return (
     <>
       <nav className="navbar glass">
-        <div className="logo"><Compass size={24} /> <span>TravelFlow</span></div>
+        <div className="logo"><Compass size={26} /> <span>TravelFlow</span></div>
         <div className="nav-links">
           <button onClick={() => setView('destinos')} className={`nav-link ${view === 'destinos' ? 'active' : ''}`}><MapPin size={18}/> Destinos</button>
           <button onClick={() => setView('reservas')} className={`nav-link ${view === 'reservas' ? 'active' : ''}`}><Calendar size={18}/> Reservas</button>
@@ -33,6 +33,17 @@ function App() {
         {view === 'pagos' && <Pagos API_URL={API_URL} />}
         {view === 'account' && <Account user={user} API_URL={API_URL} onLogout={() => { setUser(null); setView('destinos') }} onUpdate={setUser} />}
       </main>
+
+      <footer className="footer">
+        <div style={{ maxWdith: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', padding: '0 2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, color: 'var(--primary-dark)' }}>
+            <Compass size={20} /> TravelFlow &copy; {new Date().getFullYear()} — La mejor experiencia en gestión turística
+          </div>
+          <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+            Diseñado para turistas exigentes con <Heart size={14} style={{ color: '#ef4444', verticalAlign: 'middle', margin: '0 2px' }} />
+          </div>
+        </div>
+      </footer>
     </>
   )
 }

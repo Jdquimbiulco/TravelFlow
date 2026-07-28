@@ -6,7 +6,67 @@ import {
   Trash2,
   Save,
   MapPin,
+  Search,
+  Sparkles,
+  Star,
+  Globe,
+  Filter,
+  ShieldCheck,
+  CheckCircle2,
+  XCircle,
+  Tag,
 } from 'lucide-react'
+
+const DESTINATION_IMAGES = {
+  galapagos: 'https://images.unsplash.com/photo-1559732277-7453b141e3a1?auto=format&fit=crop&w=800&q=80',
+  quito: 'https://images.unsplash.com/photo-1596706915582-7774786358c2?auto=format&fit=crop&w=800&q=80',
+  cuenca: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=800&q=80',
+  cancun: 'https://images.unsplash.com/photo-1535530992830-e25d07cfa780?auto=format&fit=crop&w=800&q=80',
+  paris: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80',
+  roma: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800&q=80',
+  rome: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800&q=80',
+  tokyo: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800&q=80',
+  tokio: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800&q=80',
+  'new york': 'https://images.unsplash.com/photo-1499092346589-b9b6be3e94b2?auto=format&fit=crop&w=800&q=80',
+  miami: 'https://images.unsplash.com/photo-1506966953602-c20cc11f75e3?auto=format&fit=crop&w=800&q=80',
+  madrid: 'https://images.unsplash.com/photo-1543783207-ec64e4d95325?auto=format&fit=crop&w=800&q=80',
+  barcelona: 'https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?auto=format&fit=crop&w=800&q=80',
+  londres: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80',
+  london: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80',
+  cuzco: 'https://images.unsplash.com/photo-1526392060635-9d6019884377?auto=format&fit=crop&w=800&q=80',
+  cusco: 'https://images.unsplash.com/photo-1526392060635-9d6019884377?auto=format&fit=crop&w=800&q=80',
+  bali: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80',
+  amsterdam: 'https://images.unsplash.com/photo-1534351590666-13e3e96b5017?auto=format&fit=crop&w=800&q=80',
+  dubai: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=800&q=80',
+  sydney: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=800&q=80',
+  maldivas: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=800&q=80',
+  maldives: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=800&q=80',
+  santorini: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=800&q=80',
+  grecia: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=800&q=80',
+  punta: 'https://images.unsplash.com/photo-1584738766473-61c083514bf4?auto=format&fit=crop&w=800&q=80',
+  cana: 'https://images.unsplash.com/photo-1584738766473-61c083514bf4?auto=format&fit=crop&w=800&q=80',
+}
+
+const FALLBACK_IMAGES = [
+  'https://picsum.photos/seed/travel1/800/600',
+  'https://picsum.photos/seed/travel2/800/600',
+  'https://picsum.photos/seed/travel3/800/600',
+  'https://picsum.photos/seed/travel4/800/600',
+  'https://picsum.photos/seed/travel5/800/600',
+  'https://picsum.photos/seed/travel6/800/600',
+  'https://picsum.photos/seed/travel7/800/600',
+]
+
+const getDestinationImage = (nombre = '', ciudad = '', pais = '', id = 0) => {
+  const combined = `${nombre} ${ciudad} ${pais}`.toLowerCase()
+  for (const key of Object.keys(DESTINATION_IMAGES)) {
+    if (combined.includes(key)) {
+      return DESTINATION_IMAGES[key]
+    }
+  }
+  const index = Math.abs(Number(id) || 0) % FALLBACK_IMAGES.length
+  return FALLBACK_IMAGES[index]
+}
 
 const INITIAL_FORM = {
   nombre: '',
@@ -44,6 +104,8 @@ const Destinos = ({ API_URL }) => {
   const [editingId, setEditingId] = useState(null)
   const [message, setMessage] = useState({ text: '', type: '' })
   const [pendingDeleteId, setPendingDeleteId] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showForm, setShowForm] = useState(false)
 
   const isEditing = editingId !== null
 
@@ -72,7 +134,6 @@ const Destinos = ({ API_URL }) => {
 
   useEffect(() => {
     let cancelled = false
-
     const loadInitialData = async () => {
       try {
         const res = await fetch(`${API_URL}/destinos`)
@@ -88,7 +149,6 @@ const Destinos = ({ API_URL }) => {
         if (!cancelled) setLoading(false)
       }
     }
-
     loadInitialData()
     return () => {
       cancelled = true
@@ -104,6 +164,7 @@ const Destinos = ({ API_URL }) => {
   const resetForm = () => {
     setForm(INITIAL_FORM)
     setEditingId(null)
+    setShowForm(false)
   }
 
   const updateField = (field) => (e) => {
@@ -126,6 +187,7 @@ const Destinos = ({ API_URL }) => {
     clearMessage()
     setPendingDeleteId(null)
     setEditingId(item.id)
+    setShowForm(true)
     setForm({
       nombre: item.nombre ?? '',
       pais: item.pais ?? '',
@@ -133,6 +195,7 @@ const Destinos = ({ API_URL }) => {
       precioPorDia: Number(item.precioPorDia) || 0,
       cuposDisponibles: item.cuposDisponibles ?? 0,
     })
+    window.scrollTo({ top: 300, behavior: 'smooth' })
   }
 
   const cancelEdit = () => {
@@ -195,173 +258,237 @@ const Destinos = ({ API_URL }) => {
     }
   }
 
-  const inputStyle = { padding: '0.8rem' }
-  const messageClass =
-    message.type === 'success' ? 'account-message success' : 'account-message error'
+  const filteredDestinos = dataList.filter((item) => {
+    const q = searchQuery.toLowerCase()
+    return (
+      (item.nombre && item.nombre.toLowerCase().includes(q)) ||
+      (item.ciudad && item.ciudad.toLowerCase().includes(q)) ||
+      (item.pais && item.pais.toLowerCase().includes(q))
+    )
+  })
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem', marginTop: '2rem', alignItems: 'start' }}>
-      <div className="glass" style={{ padding: '1.5rem', borderRadius: '16px' }}>
-        <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          {isEditing ? <Save size={20} /> : <PlusCircle size={20} />}
-          {isEditing ? 'Editar destino' : 'Nuevo destino'}
-        </h3>
-
-        {message.text && (
-          <p className={messageClass} style={{ marginTop: '1rem' }} role="status">
-            {message.text}
+    <div>
+      {/* Hero Section para Turistas */}
+      <section className="hero-banner">
+        <div style={{ position: 'relative', zIndex: 2 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(2, 132, 199, 0.1)', color: 'var(--primary-dark)', padding: '0.4rem 1rem', borderRadius: '999px', fontSize: '0.85rem', fontWeight: 700, marginBottom: '1rem' }}>
+            <Sparkles size={16} /> ¡Descubre las mejores ofertas del mundo!
+          </div>
+          <h1 className="hero-title">
+            Encuentra tu próximo <span>Destino Inolvidable</span>
+          </h1>
+          <p className="hero-subtitle">
+            Explora paquetes turísticos exclusivos, playas exóticas y ciudades fascinantes con reserva inmediata y asesoría personalizada 24/7.
           </p>
-        )}
 
-        <form
-          onSubmit={handleSubmit}
-          style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem' }}
-        >
-          <input
-            placeholder="Nombre destino"
-            className="glass"
-            style={inputStyle}
-            value={form.nombre}
-            onChange={updateField('nombre')}
-            required
-            disabled={loading}
-          />
-          <input
-            placeholder="País"
-            className="glass"
-            style={inputStyle}
-            value={form.pais}
-            onChange={updateField('pais')}
-            required
-            disabled={loading}
-          />
-          <input
-            placeholder="Ciudad"
-            className="glass"
-            style={inputStyle}
-            value={form.ciudad}
-            onChange={updateField('ciudad')}
-            required
-            disabled={loading}
-          />
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            placeholder="Precio por día"
-            className="glass"
-            style={inputStyle}
-            value={form.precioPorDia}
-            onChange={updateNumericField('precioPorDia', false)}
-            required
-            disabled={loading}
-          />
-          <input
-            type="number"
-            min="0"
-            step="1"
-            placeholder="Cupos disponibles"
-            className="glass"
-            style={inputStyle}
-            value={form.cuposDisponibles}
-            onChange={updateNumericField('cuposDisponibles', true)}
-            required
-            disabled={loading}
-          />
-
-          <button type="submit" className="btn" disabled={loading}>
-            {loading ? 'Procesando…' : isEditing ? 'Guardar cambios' : 'Crear destino'}
-          </button>
-
-          {isEditing && (
+          {/* Bar de Búsqueda */}
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            <div style={{ flex: 1, minWidth: '260px', position: 'relative' }}>
+              <Search size={20} style={{ position: 'absolute', left: '1.1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+              <input
+                type="text"
+                placeholder="Buscar por destino, ciudad o país..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="glass"
+                style={{ paddingLeft: '3rem' }}
+              />
+            </div>
             <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={cancelEdit}
-              disabled={loading}
+              className="btn btn-accent"
+              onClick={() => setShowForm(!showForm)}
             >
-              Cancelar edición
+              <PlusCircle size={18} />
+              {showForm ? 'Ocultar Formulario' : 'Nuevo Destino'}
             </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Formulario Administrador / Agente de Viajes */}
+      {showForm && (
+        <div className="glass" style={{ padding: '2rem', borderRadius: '24px', marginBottom: '2.5rem', border: '1.5px solid var(--primary-light)' }}>
+          <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.3rem', color: 'var(--primary-dark)', marginBottom: '1rem' }}>
+            {isEditing ? <Save size={22} /> : <PlusCircle size={22} />}
+            {isEditing ? 'Editar destino turístico' : 'Registrar nuevo destino turístico'}
+          </h3>
+
+          {message.text && (
+            <div className={`account-message ${message.type}`} style={{ marginBottom: '1.25rem' }} role="status">
+              {message.type === 'success' ? <CheckCircle2 size={18} /> : <XCircle size={18} />}
+              {message.text}
+            </div>
           )}
-        </form>
+
+          <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+            <input
+              placeholder="Nombre destino"
+              className="glass"
+              value={form.nombre}
+              onChange={updateField('nombre')}
+              required
+              disabled={loading}
+            />
+            <input
+              placeholder="País"
+              className="glass"
+              value={form.pais}
+              onChange={updateField('pais')}
+              required
+              disabled={loading}
+            />
+            <input
+              placeholder="Ciudad"
+              className="glass"
+              value={form.ciudad}
+              onChange={updateField('ciudad')}
+              required
+              disabled={loading}
+            />
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="Precio por día"
+              className="glass"
+              value={form.precioPorDia}
+              onChange={updateNumericField('precioPorDia', false)}
+              required
+              disabled={loading}
+            />
+            <input
+              type="number"
+              min="0"
+              step="1"
+              placeholder="Cupos disponibles"
+              className="glass"
+              value={form.cuposDisponibles}
+              onChange={updateNumericField('cuposDisponibles', true)}
+              required
+              disabled={loading}
+            />
+
+            <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+              <button type="submit" className="btn" disabled={loading} style={{ flex: 1 }}>
+                {loading ? <Loader2 size={18} className="animate-spin" /> : isEditing ? 'Guardar cambios' : 'Crear destino'}
+              </button>
+              {isEditing && (
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={cancelEdit}
+                  disabled={loading}
+                >
+                  Cancelar edición
+                </button>
+              )}
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Grid de Destinos Visuales para Turistas */}
+      <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          <Globe size={24} style={{ color: 'var(--primary)' }} /> Destinos Destacados
+        </h2>
+        <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+          Mostrando {filteredDestinos.length} destinos disponibles
+        </span>
       </div>
 
-      <div className="glass" style={{ padding: '1.5rem', borderRadius: '16px' }}>
-        <h3>Listado de destinos</h3>
+      {message.text && !showForm && (
+        <div className={`account-message ${message.type}`} style={{ marginBottom: '1.5rem' }} role="status">
+          {message.type === 'success' ? <CheckCircle2 size={18} /> : <XCircle size={18} />}
+          {message.text}
+        </div>
+      )}
 
-        {loading && dataList.length === 0 ? (
-          <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }}>
-            <Loader2 size={32} className="animate-spin" />
-          </div>
-        ) : dataList.length === 0 ? (
-          <p style={{ marginTop: '1rem', color: 'var(--text-muted)' }}>
-            No hay destinos registrados.
+      {loading && dataList.length === 0 ? (
+        <div style={{ padding: '4rem', textAlign: 'center' }}>
+          <Loader2 size={40} className="animate-spin" style={{ color: 'var(--primary)', margin: '0 auto' }} />
+          <p style={{ marginTop: '1rem', color: 'var(--text-muted)', fontWeight: 600 }}>Cargando increíbles destinos...</p>
+        </div>
+      ) : filteredDestinos.length === 0 ? (
+        <div className="glass" style={{ padding: '3rem', textAlign: 'center', borderRadius: '24px' }}>
+          <p style={{ fontSize: '1.1rem', color: 'var(--text-muted)' }}>
+            No se encontraron destinos que coincidan con tu búsqueda.
           </p>
-        ) : (
-          <div
-            style={{
-              marginTop: '1rem',
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-              gap: '1rem',
-            }}
-          >
-            {dataList.map((item) => (
+        </div>
+      ) : (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+            gap: '1.75rem',
+          }}
+        >
+          {filteredDestinos.map((item) => {
+            const imageUrl = getDestinationImage(item.nombre, item.ciudad, item.pais, item.id)
+            const isLowCupos = item.cuposDisponibles <= 5
+
+            return (
               <article
                 key={item.id}
-                className="glass"
+                className="card-destination"
                 style={{
-                  padding: '1rem',
-                  borderRadius: '12px',
                   border: editingId === item.id ? '2px solid var(--primary)' : undefined,
                 }}
               >
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    gap: '0.5rem',
-                  }}
-                >
-                  <div>
-                    <strong style={{ fontSize: '1.05rem' }}>{item.nombre}</strong>
-                    <p
-                      style={{
-                        color: 'var(--text-muted)',
-                        fontSize: '0.9rem',
-                        marginTop: '0.25rem',
-                      }}
-                    >
-                      <MapPin
-                        size={14}
-                        style={{ verticalAlign: 'middle', marginRight: '0.25rem' }}
-                      />
-                      {item.ciudad}, {item.pais}
-                    </p>
+                {/* Image Cover */}
+                <div className="card-img-container">
+                  <img
+                    src={imageUrl}
+                    alt={item.nombre}
+                    className="card-img"
+                    loading="lazy"
+                    onError={(e) => {
+                      const seed = `dest-${item.id || Math.random()}`
+                      e.currentTarget.onerror = null
+                      e.currentTarget.src = `https://picsum.photos/seed/${seed}/800/600`
+                    }}
+                  />
+                  <div className="card-badge-rating">
+                    <Star size={14} fill="#d97706" /> 4.9
                   </div>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    #{item.id}
-                  </span>
+                  <div className={`card-badge-cupos ${isLowCupos ? 'cupos-low' : 'cupos-high'}`}>
+                    {isLowCupos ? `¡Últimos ${item.cuposDisponibles} cupos!` : `${item.cuposDisponibles} cupos`}
+                  </div>
                 </div>
 
-                <p style={{ marginTop: '0.75rem', fontSize: '0.9rem' }}>
-                  <strong>${Number(item.precioPorDia).toFixed(2)}</strong> / día
-                </p>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                  Cupos: {item.cuposDisponibles}
-                </p>
+                {/* Content */}
+                <div className="card-body">
+                  <div className="card-title-row">
+                    <h3 className="card-title-name">{item.nombre}</h3>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                      #{item.id}
+                    </span>
+                  </div>
 
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+                  <div className="card-location">
+                    <MapPin size={16} style={{ color: 'var(--accent)' }} />
+                    <span>{item.ciudad}, {item.pais}</span>
+                  </div>
+
+                  <div className="card-price-row">
+                    <div>
+                      <span className="card-price-amount">${Number(item.precioPorDia).toFixed(2)}</span>
+                      <span className="card-price-unit"> / día</span>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.25rem' }}>
                     <button
                       type="button"
                       className="btn btn-secondary"
-                      style={{ flex: 1, padding: '0.5rem' }}
+                      style={{ flex: 1, padding: '0.6rem', fontSize: '0.85rem' }}
                       onClick={() => startEdit(item)}
                       disabled={loading}
                       aria-label={`Editar ${item.nombre}`}
                     >
-                      <Pencil size={16} />
+                      <Pencil size={15} style={{ marginRight: '0.3rem' }} /> Editar
                     </button>
 
                     {pendingDeleteId === item.id ? (
@@ -369,7 +496,7 @@ const Destinos = ({ API_URL }) => {
                         <button
                           type="button"
                           className="btn btn-danger"
-                          style={{ flex: 1, padding: '0.5rem', fontSize: '0.85rem' }}
+                          style={{ flex: 1, padding: '0.6rem', fontSize: '0.82rem' }}
                           onClick={() => handleDelete(item.id)}
                           disabled={loading}
                         >
@@ -378,31 +505,33 @@ const Destinos = ({ API_URL }) => {
                         <button
                           type="button"
                           className="btn btn-secondary"
-                          style={{ padding: '0.5rem' }}
+                          style={{ padding: '0.6rem' }}
                           onClick={() => setPendingDeleteId(null)}
                           disabled={loading}
                           aria-label="Cancelar eliminación"
-                        >                          
+                        >
+                          <XCircle size={15} />
                         </button>
                       </>
                     ) : (
                       <button
                         type="button"
                         className="btn btn-danger"
-                        style={{ flex: 1, padding: '0.5rem' }}
+                        style={{ padding: '0.6rem' }}
                         onClick={() => setPendingDeleteId(item.id)}
                         disabled={loading}
                         aria-label={`Eliminar ${item.nombre}`}
                       >
-                        <Trash2 size={16} />
+                        <Trash2 size={15} />
                       </button>
                     )}
                   </div>
+                </div>
               </article>
-            ))}
-          </div>
-        )}
-      </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

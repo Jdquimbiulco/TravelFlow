@@ -2,3 +2,5 @@ node_modules
 coverage/
 .scannerwork/
 .env
+.env.*
+!.env.example

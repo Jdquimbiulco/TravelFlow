@@ -3,4 +3,5 @@ module.exports = {
   clearMocks: true,
   coverageDirectory: 'coverage',
   moduleDirectories: ['node_modules', 'src'],
+  testPathIgnorePatterns: ['/node_modules/', '/frontend/'],
 };
