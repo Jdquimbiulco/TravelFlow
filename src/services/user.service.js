@@ -32,8 +32,12 @@ const loginUser = async (correo, contrasena) => {
 };
 
 const createUser = async (data) => {
+  const sanitizedData = { ...data };
+  if (sanitizedData.documentoIdentidad === "") sanitizedData.documentoIdentidad = null;
+  if (sanitizedData.telefono === "") sanitizedData.telefono = null;
+
   return await prisma.usuario.create({
-    data,
+    data: sanitizedData,
     select: { id: true, correo: true, nombre: true, rol: true }
   });
 };
