@@ -4,4 +4,5 @@ module.exports = {
   coverageDirectory: 'coverage',
   moduleDirectories: ['node_modules', 'src'],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
+  testPathIgnorePatterns: ['/node_modules/', '/frontend/'],
 };

@@ -52,9 +52,16 @@ describe('Payment Endpoints', () => {
         expect(res.statusCode).toEqual(200);
         expect(res.body).toEqual(mockPayment);
         expect(prisma.pago.findUnique).toHaveBeenCalledWith({
-            where: { id: 1 }
+            where: { id: 1 },
+            include: {
+                reserva: {
+                    include: {
+                        destino: true,
+                        usuario: true
+                    }
+                }
+            }
         });
-    });
 
     it('should return 404 if payment not found', async () => {
         prisma.pago.findUnique.mockResolvedValue(null);

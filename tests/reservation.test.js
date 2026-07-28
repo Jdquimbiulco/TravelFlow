@@ -10,6 +10,9 @@ jest.mock('../src/config/db', () => ({
         update: jest.fn(),
         delete: jest.fn(),
     },
+    pago: {
+        deleteMany: jest.fn()
+    }
 }));
 
 describe('Reservation Endpoints', () => {
@@ -101,9 +104,12 @@ describe('Reservation Endpoints', () => {
         const res = await request(app)
             .put('/api/reservas/1')
             .send({
+                usuarioId: 1,
+                destinoId: 2,
                 estado: 'CONFIRMADA',
                 fechaInicio: mockReservation.fechaInicio,
-                fechaFin: mockReservation.fechaFin
+                fechaFin: mockReservation.fechaFin,
+                precioTotal: 500
             });
         expect(res.statusCode).toEqual(200);
         expect(prisma.reserva.update).toHaveBeenCalled();
@@ -114,15 +120,24 @@ describe('Reservation Endpoints', () => {
         const res = await request(app)
             .put('/api/reservas/1')
             .send({
-                estado: 'CONFIRMADA'
+                usuarioId: 1,
+                destinoId: 2,
+                estado: 'CONFIRMADA',
+                fechaInicio: mockReservation.fechaInicio,
+                fechaFin: mockReservation.fechaFin,
+                precioTotal: 500
             });
         expect(res.statusCode).toEqual(500);
     });
 
     it('should delete a reservation', async () => {
+        prisma.pago.deleteMany.mockResolvedValue({ count: 1 });
         prisma.reserva.delete.mockResolvedValue(mockReservation);
         const res = await request(app).delete('/api/reservas/1');
         expect(res.statusCode).toEqual(204);
+        expect(prisma.pago.deleteMany).toHaveBeenCalledWith({
+            where: { reservaId: 1 }
+        });
         expect(prisma.reserva.delete).toHaveBeenCalledWith({
             where: { id: 1 }
         });

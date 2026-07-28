@@ -46,7 +46,7 @@ describe('User Endpoints', () => {
     expect(res.body).toEqual(mockUser);
     expect(prisma.usuario.findUnique).toHaveBeenCalledWith({
       where: { id: 1 },
-      select: { id: true, correo: true, nombre: true, rol: true, fechaRegistro: true }
+      select: { id: true, correo: true, nombre: true, rol: true, fechaRegistro: true, telefono: true }
     });
   });
 
