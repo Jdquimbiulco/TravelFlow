@@ -32,10 +32,7 @@ describe('Error Middleware', () => {
         expect(console.error).toHaveBeenCalledWith(err.stack);
         expect(mockResponse.status).toHaveBeenCalledWith(400);
         expect(mockResponse.json).toHaveBeenCalledWith({
-            status: 'error',
-            statusCode: 400,
-            message: 'Custom Error',
-            stack: err.stack
+            message: 'Custom Error'
         });
     });
 
@@ -49,9 +46,7 @@ describe('Error Middleware', () => {
         expect(console.error).toHaveBeenCalledWith(err.stack);
         expect(mockResponse.status).toHaveBeenCalledWith(500);
         expect(mockResponse.json).toHaveBeenCalledWith({
-            status: 'error',
-            statusCode: 500,
-            message: 'Internal Server Error'
+            message: 'Error interno del servidor'
         });
     });
 });

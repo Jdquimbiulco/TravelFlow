@@ -62,6 +62,7 @@ describe('Payment Endpoints', () => {
                 }
             }
         });
+    });
 
     it('should return 404 if payment not found', async () => {
         prisma.pago.findUnique.mockResolvedValue(null);
