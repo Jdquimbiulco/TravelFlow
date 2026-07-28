@@ -15,7 +15,12 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin && ['development', 'test'].includes(process.env.NODE_ENV)) {
+    // Permitir requests sin origin (ej: curl, postman) o en desarrollo/test
+    if (!origin || ['development', 'test'].includes(process.env.NODE_ENV)) {
+      return callback(null, true);
+    }
+    // Permitir cualquier subdominio de vercel para facilitar el despliegue del frontend
+    if (origin.endsWith('.vercel.app') || origin.endsWith('.onrender.com')) {
       return callback(null, true);
     }
     if (allowedOrigins.includes(origin)) {
@@ -41,7 +46,9 @@ app.get('/', (req, res) => {
 });
 
 // Routes
+// Montamos en ambos para evitar problemas de enrutamiento en Vercel si Vercel remueve el /api o no
 app.use('/api', routes);
+app.use('/', routes);
 
 app.use(errorHandler);
 
