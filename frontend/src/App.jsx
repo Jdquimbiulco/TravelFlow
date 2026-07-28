@@ -7,7 +7,7 @@ import Pagos from './components/Pagos'
 
 function App() {
   const [view, setView] = useState('usuarios')
-  const API_URL = 'http://localhost:3000/api'
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
   return (
     <>
