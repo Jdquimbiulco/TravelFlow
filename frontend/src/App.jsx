@@ -9,7 +9,7 @@ import Account from './components/Account.jsx'
 function App() {
   const [user, setUser] = useState(null)
   const [view, setView] = useState('destinos')
-  const API_URL = 'http://localhost:3000/api'
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
   if (!user) {
     return <Auth API_URL={API_URL} onLogin={setUser} />

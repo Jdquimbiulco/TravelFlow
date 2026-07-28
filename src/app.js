@@ -32,6 +32,15 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Root Route
+app.get('/', (req, res) => {
+    res.status(200).json({
+        mensaje: 'CI/CD Funcionando correctamente',
+        servicio: 'API Express lista para Vercel'
+    });
+});
+
+// Routes
 app.use('/api', routes);
 
 app.use(errorHandler);
